@@ -1,5 +1,21 @@
-<div class="FCKThumb">
-  <table border="0" cellpadding="0" cellspacing="0" height="100" width="100">
+<div class="FCKThumb" style="position:relative">
+   <% if controller.action_name == 'edit_images' %>
+		<%= link_to '', "/assets/#{image.id}", :class => 'remote-delete'%>
+ 
+		<script type="text/javascript" charset="utf-8">
+			$(document).ready(function() {
+			  $('a.remote-delete').click(function() {
+			    // we just need to add the key/value pair for the DELETE method
+			    // as the second argument to the JQuery $.post() call
+
+			    $.post(this.href, { _method: 'delete' }, null, "script");
+					$(this).closest(".FCKThumb").hide();
+			    return false;
+			  });
+			});
+		</script>
+	<% end -%>  
+<table border="0" cellpadding="0" cellspacing="0" height="100" width="100">
     <tbody>
       <tr>
         <td align="center" valign="middle">
@@ -8,8 +24,11 @@
        </tr>
      </tbody>
    </table>
-   
+
    <div class="FCKFileName"><%= image.filename %></div>
    <div class="FCKFileDate"><%= image.format_created_at %></div>
    <div class="FCKFileSize"><%= number_to_human_size(image.size, :precision => 2) %></div>
+	<div class="FCKFileDelete" style='position:absolute; z-index:20000;'>
+
+	</div>
 </div>

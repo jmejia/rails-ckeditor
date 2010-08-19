@@ -12,6 +12,15 @@ class CkeditorController < ActionController::Base
       format.xml { render :xml=>@images }
     end
   end
+
+	def edit_images
+    @images = Picture.find(:all, :order=>"id DESC")
+    
+    respond_to do |format|
+      format.html {}
+      format.xml { render :xml=>@images }
+    end
+  end
   
   # GET /ckeditor/files
   def files
@@ -20,6 +29,15 @@ class CkeditorController < ActionController::Base
     respond_to do |format|
       format.html {}
       format.xml { render :xml=>@files }
+    end
+  end
+
+	def edit_files
+    @files = AttachmentFile.find(:all, :order=>"id DESC")
+    
+    respond_to do |format|
+      format.html {}
+      format.xml { render :xml=>@images }
     end
   end
   
@@ -56,6 +74,23 @@ class CkeditorController < ActionController::Base
     end
   end
 
+	def delete
+	  image = Picture.find(params[:id])
+	  respond_to do |format|
+	  	format.html # delete.html.erb
+	  end
+	end
+	
+	def destroy
+	@image = Picture.find( params[:id] )
+	redirect_to(images_path) and return if params[:cancel]
+	@image.destroy
+	respond_to do |format|
+		format.html { redirect_to images_path }
+		format.js { render :nothing => true }
+	end
+	end
+	
   private
     
     def swf_options
@@ -85,5 +120,5 @@ class CkeditorController < ActionController::Base
     def escape_single_quotes(str)
       str.gsub('\\','\0\0').gsub('</','<\/').gsub(/\r\n|\n|\r/, "\\n").gsub(/["']/) { |m| "\\#{m}" }
     end
-  
+
 end

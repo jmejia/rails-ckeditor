@@ -10,6 +10,7 @@
  * this file is part of the Source Code of CKFinder.
  */
 
+
 div.FCKThumb
 {
 	clear: none;
@@ -297,3 +298,5 @@ td.FCKFileSize
 	width: 200px;
 	display:inline-block;
 }
+
+

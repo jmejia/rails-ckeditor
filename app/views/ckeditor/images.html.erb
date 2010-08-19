@@ -27,14 +27,17 @@
     var f = new FileThumb('qu');
     var t = new ToolBar('nv');
     
-    var b1 = new Button('Upload New File', 'Upload', 'add.gif');
-    var b2 = new Button('Refresh', 'Refresh', 'refresh.gif');
+    var b1 = new Button('Upload New File', 'Upload', 'add.png');
+    var b2 = new Button('Refresh', 'Refresh', 'refresh.png');
+		var b3 = new Button('Manage Files', 'Edit', 'edit.png');
     
     b1.callback = uploadButton;
     b2.callback = function(){ window.location.reload(); }
-    
+    b3.callback = function(){ window.location="/ckeditor/edit_images"; };
+
     t.buttons.push(b1);
     t.buttons.push(b2);
+		t.buttons.push(b3);
     
     t.init();
   }
@@ -79,11 +82,10 @@
 			</div>
 		</td>
 	</tr>
-
 	<tr>
 		<td style="height: 100%;" id="qu">
 		  <div style="overflow:auto; height:550px;" id='container'>
-			 <%= render :partial=>"image", :collection=>@images %>
+			 <%= render :partial => "image", :collection => @images %>
 		  </div>
 		</td>
 	</tr>
