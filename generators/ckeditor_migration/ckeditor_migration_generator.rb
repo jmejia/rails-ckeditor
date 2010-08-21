@@ -27,7 +27,7 @@ class CkeditorMigrationGenerator < Rails::Generator::Base
     end
       
     def ckeditor_dir
-      'ckeditor'
+      ''
     end
     
     def generator_dir

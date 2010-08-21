@@ -4,7 +4,7 @@ class CkeditorInstallGenerator < Rails::Generator::Base
 
   def manifest
     record do |m|
-      copy_initializer(m)
+      create_yml(m)
       copy_javascripts(m)
       
       m.readme "README"
@@ -12,10 +12,15 @@ class CkeditorInstallGenerator < Rails::Generator::Base
   end
 
   private
-  
-    def copy_initializer(m)
-      m.directory "config/initializers"
-      m.template  "ckeditor.rb", "config/initializers/ckeditor.rb"
+  	cattr_accessor :filepath
+  	@@filepath = File.join(RAILS_ROOT, "config/ckeditor.yml")
+
+    def create_yml(m)
+      unless File.exists?(@@filepath)
+        ck_config = File.join(RAILS_ROOT, 'vendor/plugins/rails-ckeditor/', 'ckeditor.yml.tpl')
+        FileUtils.cp ck_config, @@filepath unless File.exist?(@@filepath)
+
+      end
     end
     
     def copy_javascripts(m)
