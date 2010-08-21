@@ -4,6 +4,8 @@ class CkeditorMigrationGenerator < Rails::Generator::Base
     record do |m|
       create_scaffold(m)
       create_migration(m)
+			
+			m.readme 'README'
     end
   end
 
