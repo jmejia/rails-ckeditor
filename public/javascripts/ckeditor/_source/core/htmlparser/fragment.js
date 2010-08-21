@@ -108,9 +108,9 @@ CKEDITOR.htmlParser.fragment = function()
 			}
 		}
 
-		function sendPendingBRs( brsToIgnore )
+		function sendPendingBRs()
 		{
-			while ( pendingBRs.length - ( brsToIgnore || 0 ) > 0 )
+			while ( pendingBRs.length )
 				currentNode.add( pendingBRs.shift() );
 		}
 
@@ -392,8 +392,7 @@ CKEDITOR.htmlParser.fragment = function()
 		// Parse it.
 		parser.parse( fragmentHtml );
 
-		// Send all pending BRs except one, which we consider a unwanted bogus. (#5293)
-		sendPendingBRs( !CKEDITOR.env.ie && 1 );
+		sendPendingBRs();
 
 		// Close all pending nodes.
 		while ( currentNode.type )

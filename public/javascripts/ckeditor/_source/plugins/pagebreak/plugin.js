@@ -32,10 +32,10 @@ CKEDITOR.plugins.add( 'pagebreak',
 				'clear: both;' +
 				'display: block;' +
 				'float: none;' +
-				'width:100% !important; _width:99.9% !important;' +
+				'width: 100%;' +
 				'border-top: #999999 1px dotted;' +
 				'border-bottom: #999999 1px dotted;' +
-				'height: 5px !important;' +
+				'height: 5px;' +
 				'page-break-after: always;' +
 
 			'}' );
@@ -82,15 +82,13 @@ CKEDITOR.plugins.pagebreakCmd =
 		// Creates the fake image used for this element.
 		breakObject = editor.createFakeElement( breakObject, 'cke_pagebreak', 'div' );
 
-		var ranges = editor.getSelection().getRanges( true );
+		var ranges = editor.getSelection().getRanges();
 
-		editor.fire( 'saveSnapshot' );
-
-		for ( var range, i = ranges.length - 1 ; i >= 0; i-- )
+		for ( var range, i = 0 ; i < ranges.length ; i++ )
 		{
 			range = ranges[ i ];
 
-			if ( i < ranges.length -1 )
+			if ( i > 0 )
 				breakObject = breakObject.clone( true );
 
 			range.splitBlock( 'p' );
@@ -100,13 +98,6 @@ CKEDITOR.plugins.pagebreakCmd =
 				range.moveToPosition( breakObject, CKEDITOR.POSITION_AFTER_END );
 				range.select();
 			}
-
-			var previous = breakObject.getPrevious();
-
-			if ( CKEDITOR.dtd[ previous.getName() ].div )
-				breakObject.move( previous );
 		}
-
-		editor.fire( 'saveSnapshot' );
 	}
 };

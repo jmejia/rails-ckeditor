@@ -388,13 +388,11 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 		// Associate filebrowser to elements with 'filebrowser' attribute.
 		for ( var i in definition.contents )
 		{
-			if ( ( element = definition.contents[ i ] ) )
+			element = definition.contents[ i ] ;
+			attachFileBrowser( evt.editor, evt.data.name, definition, element.elements );
+			if ( element.hidden && element.filebrowser )
 			{
-				attachFileBrowser( evt.editor, evt.data.name, definition, element.elements );
-				if ( element.hidden && element.filebrowser )
-				{
-					element.hidden = !isConfigured( definition, element[ 'id' ], element.filebrowser );
-				}
+				element.hidden = !isConfigured( definition, element[ 'id' ], element.filebrowser );
 			}
 		}
 	} );

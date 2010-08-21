@@ -67,7 +67,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 		},
 
 		// Convert our internal representation of a list back to a DOM forest.
-		arrayToList : function( listArray, database, baseIndex, paragraphMode, dir )
+		arrayToList : function( listArray, database, baseIndex, paragraphMode )
 		{
 			if ( !baseIndex )
 				baseIndex = 0;
@@ -109,12 +109,8 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 					else
 					{
 						// Create completely new blocks here, attributes are dropped.
-						if ( dir || ( paragraphMode != CKEDITOR.ENTER_BR && item.grandparent.getName() != 'td' ) )
-						{
+						if ( paragraphMode != CKEDITOR.ENTER_BR && item.grandparent.getName() != 'td' )
 							currentListItem = doc.createElement( paragraphName );
-							if ( dir )
-								currentListItem.setAttribute( 'dir', dir );
-						}
 						else
 							currentListItem = new CKEDITOR.dom.documentFragment( doc );
 					}
@@ -222,13 +218,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 			CKEDITOR.dom.element.setMarker( database, itemNode, 'list_item_processed', true );
 		}
 
-		var root = groupObj.root,
-			fakeParent = root.getDocument().createElement( this.type );
-		// Copy all attributes, except from 'start' and 'type'.
-		root.copyAttributes( fakeParent, { start : 1, type : 1 } );
-		// The list-style-type property should be ignored.
-		fakeParent.removeStyle( 'list-style-type' );
-
+		var fakeParent = groupObj.root.getDocument().createElement( this.type );
 		for ( i = 0 ; i < selectedListItems.length ; i++ )
 		{
 			var listIndex = selectedListItems[i].getCustomData( 'listarray_index' );
@@ -243,8 +233,6 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 		}
 		newList.listNode.replace( groupObj.root );
 	}
-
-	var headerTagRegex = /^h[1-6]$/;
 
 	function createList( editor, groupObj, listsCreated )
 	{
@@ -290,40 +278,21 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 		// Insert the list to the DOM tree.
 		var insertAnchor = listContents[ listContents.length - 1 ].getNext(),
-			listNode = doc.createElement( this.type ),
-			dir;
+			listNode = doc.createElement( this.type );
 
 		listsCreated.push( listNode );
 		while ( listContents.length )
 		{
 			var contentBlock = listContents.shift(),
 				listItem = doc.createElement( 'li' );
-
-			// Preserve heading structure when converting to list item. (#5271)
-			if ( headerTagRegex.test( contentBlock.getName() ) )
-				contentBlock.appendTo( listItem );
-			else
-			{
-				if ( contentBlock.hasAttribute( 'dir' ) )
-				{
-					dir = dir || contentBlock.getAttribute( 'dir' );
-					contentBlock.removeAttribute( 'dir' );
-				}
-				contentBlock.copyAttributes( listItem );
-				contentBlock.moveChildren( listItem );
-				contentBlock.remove();
-			}
-
+			contentBlock.moveChildren( listItem );
+			contentBlock.remove();
 			listItem.appendTo( listNode );
 
 			// Append a bogus BR to force the LI to render at full height
 			if ( !CKEDITOR.env.ie )
 				listItem.appendBogus();
 		}
-
-		if ( dir )
-			listNode.setAttribute( 'dir', dir );
-
 		if ( insertAnchor )
 			listNode.insertBefore( insertAnchor );
 		else
@@ -373,8 +342,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 			}
 		}
 
-		var newList = CKEDITOR.plugins.list.arrayToList( listArray, database, null, editor.config.enterMode,
-			groupObj.root.getAttribute( 'dir' ) );
+		var newList = CKEDITOR.plugins.list.arrayToList( listArray, database, null, editor.config.enterMode );
 
 		// Compensate <br> before/after the list node if the surrounds are non-blocks.(#3836)
 		var docFragment = newList.listNode, boundaryNode, siblingNode;
@@ -406,7 +374,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 			var doc = editor.document,
 				selection = editor.getSelection(),
-				ranges = selection && selection.getRanges( true );
+				ranges = selection && selection.getRanges();
 
 			// There should be at least one selected range.
 			if ( !ranges || ranges.length < 1 )
@@ -454,12 +422,12 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 			// Group the blocks up because there are many cases where multiple lists have to be created,
 			// or multiple lists have to be cancelled.
 			var listGroups = [],
-				database = {},
-				rangeIterator = ranges.createIterator(),
-				index = 0;
+				database = {};
 
-			while ( ( range = rangeIterator.getNextRange() ) && ++index )
+			while ( ranges.length > 0 )
 			{
+				range = ranges.shift();
+
 				var boundaryNodes = range.getBoundaryNodes(),
 					startNode = boundaryNodes.startNode,
 					endNode = boundaryNodes.endNode;
@@ -477,12 +445,6 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 				while ( ( block = iterator.getNextParagraph() ) )
 				{
-					// Avoid duplicate blocks get processed across ranges.
-					if( block.getCustomData( 'list_block' ) )
-						continue;
-					else
-						CKEDITOR.dom.element.setMarker( database, block, 'list_block', 1 );
-
 					var path = new CKEDITOR.dom.elementPath( block ),
 						pathElements = path.elements,
 						pathElementsCount = pathElements.length,
@@ -502,7 +464,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 							// no longer be valid. Since paragraphs after the list
 							// should belong to a different group of paragraphs before
 							// the list. (Bug #1309)
-							blockLimit.removeCustomData( 'list_group_object_' + index );
+							blockLimit.removeCustomData( 'list_group_object' );
 
 							var groupObj = element.getCustomData( 'list_group_object' );
 							if ( groupObj )
@@ -521,14 +483,14 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 					if ( processedFlag )
 						continue;
 
-					// No list ancestor? Group by block limit, but don't mix contents from different ranges.
+					// No list ancestor? Group by block limit.
 					var root = blockLimit;
-					if ( root.getCustomData( 'list_group_object_' + index ) )
-						root.getCustomData( 'list_group_object_' + index ).contents.push( block );
+					if ( root.getCustomData( 'list_group_object' ) )
+						root.getCustomData( 'list_group_object' ).contents.push( block );
 					else
 					{
 						groupObj = { root : root, contents : [ block ] };
-						CKEDITOR.dom.element.setMarker( database, root, 'list_group_object_' + index, groupObj );
+						CKEDITOR.dom.element.setMarker( database, root, 'list_group_object', groupObj );
 						listGroups.push( groupObj );
 					}
 				}
@@ -562,7 +524,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 					var sibling = listNode[ rtl ?
 						'getPrevious' : 'getNext' ]( CKEDITOR.dom.walker.whitespaces( true ) );
 					if ( sibling && sibling.getName &&
-						 sibling.getName() == listCommand.type )
+					     sibling.getName() == listCommand.type )
 					{
 						sibling.remove();
 						// Move children order by merge direction.(#3820)
