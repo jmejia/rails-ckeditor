@@ -26,8 +26,10 @@ class CkeditorInstallGenerator < Rails::Generator::Base
     def copy_javascripts(m)
       src_dir = File.join(@source_root, 'ckeditor')
       dst_dir = File.join(RAILS_ROOT, 'public', 'javascripts')
-      
+      jquery 	= File.join(@source_root, 'jquery-1.4.2.min.js')
+	
       FileUtils.cp_r src_dir, dst_dir, :verbose => true
+      FileUtils.cp_r jquery, dst_dir, :verbose => true
     end
 
 end
