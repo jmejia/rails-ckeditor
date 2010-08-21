@@ -10,6 +10,7 @@
  * this file is part of the Source Code of CKFinder.
  */
 
+
 div.FCKThumb
 {
 	clear: none;
@@ -20,7 +21,6 @@ div.FCKThumb
 	background-color: #ffffff;
 	cursor: default;
 }
-
 
 div.FCKThumb a.remote-delete {
 	display:block;
@@ -34,7 +34,6 @@ div.FCKThumb a.remote-delete {
 div.FCKThumb a.remote-delete:hover {
 	background-position: 0px 14px;
 }
- 
 
 div.FCKThumb table img {
 	display: block;
@@ -312,3 +311,5 @@ td.FCKFileSize
 	width: 200px;
 	display:inline-block;
 }
+
+

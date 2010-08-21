@@ -38,4 +38,8 @@ module CkeditorHelper
     
     image_tag(image, :alt=>path, :title=>filename, :onerror=>"this.src='/javascripts/ckeditor/images/ckfnothumb.gif'", :class=>'image')
   end
+
+	def current_user
+    @current_user ||= (login_from_session || login_from_basic_auth || login_from_cookie) unless @current_user == false
+  end
 end

@@ -15,25 +15,22 @@ CKEDITOR.dialog.add( 'specialchar', function( editor )
 	var insertSpecialChar = function ( specialChar )
 	{
 		var selection = editor.getSelection(),
-			ranges = selection.getRanges( true ),
+			ranges	  = selection.getRanges(),
 			range, textNode;
 
 		editor.fire( 'saveSnapshot' );
 
-		for ( var i = ranges.length - 1; i >= 0 ; i-- )
+		for ( var i = 0, len = ranges.length ; i < len ; i++ )
 		{
 			range = ranges[ i ];
 			range.deleteContents();
 
-			textNode = CKEDITOR.dom.element.createFromHtml( specialChar );
+			textNode =  CKEDITOR.dom.element.createFromHtml( specialChar );
 			range.insertNode( textNode );
 		}
 
-		if ( range )
-		{
-			range.moveToPosition( textNode, CKEDITOR.POSITION_AFTER_END );
-			range.select();
-		}
+		range.moveToPosition( textNode, CKEDITOR.POSITION_AFTER_END );
+		range.select();
 
 		editor.fire( 'saveSnapshot' );
 	};
@@ -265,8 +262,7 @@ CKEDITOR.dialog.add( 'specialchar', function( editor )
 			var columns = this.definition.charColumns,
 				chars = this.definition.chars;
 
-			var charsTableLabel =  CKEDITOR.tools.getNextId() + '_specialchar_table_label';
-			var html = [ '<table role="listbox" aria-labelledby="' + charsTableLabel + '"' +
+			var html = [ '<table role="listbox" aria-labelledby="specialchar_table_label"' +
 						 			' style="width: 320px; height: 100%; border-collapse: separate;"' +
 						 			' align="center" cellspacing="2" cellpadding="2" border="0">' ];
 
@@ -293,14 +289,12 @@ CKEDITOR.dialog.add( 'specialchar', function( editor )
 						// Use character in case description unavailable.
 						charDesc = charDesc || character;
 
-						var charLabelId =  'cke_specialchar_label_' + i + '_' + CKEDITOR.tools.getNextNumber();
-
 						html.push(
 							'<td class="cke_dark_background" style="cursor: default" role="presentation">' +
 							'<a href="javascript: void(0);" role="option"' +
 							' aria-posinset="' + ( i +1 ) + '"',
 							' aria-setsize="' + size + '"',
-							' aria-labelledby="' + charLabelId + '"',
+							' aria-labelledby="cke_specialchar_label_' + i + '"',
 							' style="cursor: inherit; display: block; height: 1.25em; margin-top: 0.25em; text-align: center;" title="', CKEDITOR.tools.htmlEncode( charDesc ), '"' +
 							' onkeydown="CKEDITOR.tools.callFunction( ' + onKeydown + ', event, this )"' +
 							' onclick="CKEDITOR.tools.callFunction(' + onClick + ', this); return false;"' +
@@ -308,7 +302,7 @@ CKEDITOR.dialog.add( 'specialchar', function( editor )
 							'<span style="margin: 0 auto;cursor: inherit">' +
 							character +
 							'</span>' +
-							'<span class="cke_voice_label" id="' + charLabelId + '">' +
+							'<span class="cke_voice_label" id="cke_specialchar_label_' + i + '">' +
 							charDesc +
 							'</span></a>');
 					}
@@ -320,7 +314,7 @@ CKEDITOR.dialog.add( 'specialchar', function( editor )
 				html.push( '</tr>' );
 			}
 
-			html.push( '</tbody></table>', '<span id="' + charsTableLabel + '" class="cke_voice_label">' + lang.options +'</span>' );
+			html.push( '</tbody></table>', '<span id="specialchar_table_label" class="cke_voice_label">' + lang.options +'</span>' );
 
 			this.getContentElement( 'info', 'charContainer' ).getElement().setHtml( html.join( '' ) );
 		},

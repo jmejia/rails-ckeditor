@@ -133,9 +133,7 @@ For licensing, see LICENSE.html or http://ckeditor.com/license
 
 			editor.on( 'contentDomUnload', function()
 				{
-					// If the spaceElement hasn't been initialized, don't try to do it at this time
-					// Only reuse existing reference.
-					spaceElement && spaceElement.setHtml( emptyHtml );
+					getSpaceElement().setHtml( emptyHtml );
 				});
 
 			editor.addCommand( 'elementsPathFocus', commands.toolbarFocus );
@@ -170,10 +168,9 @@ CKEDITOR._.elementsPath =
 
 		ev = new CKEDITOR.dom.event( ev );
 
-		var rtl = editor.lang.dir == 'rtl';
 		switch ( ev.getKeystroke() )
 		{
-			case rtl ? 39 : 37 :					// LEFT-ARROW
+			case 37 :					// LEFT-ARROW
 			case 9 :					// TAB
 				element = CKEDITOR.document.getById( idBase + ( elementIndex + 1 ) );
 				if ( !element )
@@ -181,7 +178,7 @@ CKEDITOR._.elementsPath =
 				element.focus();
 				return false;
 
-			case rtl ? 37 : 39 :					// RIGHT-ARROW
+			case 39 :					// RIGHT-ARROW
 			case CKEDITOR.SHIFT + 9 :	// SHIFT + TAB
 				element = CKEDITOR.document.getById( idBase + ( elementIndex - 1 ) );
 				if ( !element )
